@@ -1,7 +1,3 @@
-import task.LocalPriceTask
-import task.NewsTask
-import task.RSSPriceTask
-import task.USSPriceTask
 import java.util.*
 
 object RubberApiService {
