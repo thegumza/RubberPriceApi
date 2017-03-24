@@ -2,21 +2,18 @@ import java.util.*
 
 object RubberApiService {
 
-    var timer = Timer()
-    var newsTask: NewsTask? = null
-        get() = NewsTask
-    var ussTask: USSPriceTask? = null
-        get() = USSPriceTask
-    var rssTask: RSSPriceTask? = null
-        get() = RSSPriceTask
-    var localTask: LocalPriceTask? = null
-        get() = LocalPriceTask
-
     @JvmStatic fun main(args: Array<String>) {
-        timer.scheduleAtFixedRate(newsTask, 0, 3600000)
-        timer.scheduleAtFixedRate(ussTask, 0, 3600000)
-        timer.scheduleAtFixedRate(rssTask, 0, 3600000)
-        timer.scheduleAtFixedRate(localTask, 0, 3600000)
+
+        val timer = Timer()
+        val newsTask = NewsTask::class
+        val ussTask = USSPriceTask::class
+        val rssTask = RSSPriceTask::class
+        val localTask = LocalPriceTask::class
+
+        timer.scheduleAtFixedRate(newsTask.objectInstance, 0, 3600000)
+        timer.scheduleAtFixedRate(ussTask.objectInstance, 0, 3600000)
+        timer.scheduleAtFixedRate(rssTask.objectInstance, 0, 3600000)
+        timer.scheduleAtFixedRate(localTask.objectInstance, 0, 3600000)
 
     }
 
