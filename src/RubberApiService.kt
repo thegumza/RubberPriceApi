@@ -3,10 +3,14 @@ import java.util.*
 object RubberApiService {
 
     var timer = Timer()
-    var newsTask = NewsTask
-    var ussTask = USSPriceTask
-    var rssTask = RSSPriceTask
-    var localTask = LocalPriceTask
+    var newsTask: NewsTask? = null
+        get() = NewsTask
+    var ussTask: USSPriceTask? = null
+        get() = USSPriceTask
+    var rssTask: RSSPriceTask? = null
+        get() = RSSPriceTask
+    var localTask: LocalPriceTask? = null
+        get() = LocalPriceTask
 
     @JvmStatic fun main(args: Array<String>) {
         timer.scheduleAtFixedRate(newsTask, 0, 3600000)
