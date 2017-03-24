@@ -1,61 +1,58 @@
-package task
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import java.io.IOException
 import com.squareup.okhttp.OkHttpClient
 import com.squareup.okhttp.Request
-import model.LocalModel
-import model.LocalRubber
+import model.Rubber
+import model.RubberModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import java.io.File
 import java.util.*
 
-object LocalPriceTask : TimerTask() {
-
+object RSSPriceTask : java.util.TimerTask() {
     var months = arrayOf("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม")
-
     override fun run() {
-        val client = OkHttpClient()
+        val client = com.squareup.okhttp.OkHttpClient()
 
-        val request = Request.Builder()
-                .url("http://www.rubberthai.com/yang/HisLoc.php")
+        val request = com.squareup.okhttp.Request.Builder()
+                .url("http://www.rubberthai.com/yang/HisRSS.php")
                 .get()
                 .addHeader("cache-control", "no-cache")
                 .build()
 
         val response = client.newCall(request).execute()
-        val doc: Document? = Jsoup.parse(response.body().string())
-        val elements: Elements? = doc?.getElementsByTag("tbody")?.first()?.getElementsByTag("tr")
-        val rubberModel: LocalModel? = LocalModel()
+        val doc: org.jsoup.nodes.Document? = org.jsoup.Jsoup.parse(response.body().string())
+        val elements: org.jsoup.select.Elements? = doc?.getElementsByTag("tbody")?.first()?.getElementsByTag("tr")
         var month: String? = null
         val year = doc?.select(".year")?.text()?.toInt()?.minus(543)
-        val songkhlaList: MutableList<LocalRubber>? = ArrayList()
-        val suratList: MutableList<LocalRubber>? = ArrayList()
-        val nakornList: MutableList<LocalRubber>? = ArrayList()
+        val rubberModel: model.RubberModel? = model.RubberModel()
+        val songkhlaList: MutableList<model.Rubber>? = java.util.ArrayList()
+        val suratList: MutableList<model.Rubber>? = java.util.ArrayList()
+        val nakornList: MutableList<model.Rubber>? = java.util.ArrayList()
         for (x in elements?.indices!!) {
-            if (x > 3) {
+            if (x > 4) {
                 if (months.contains(elements[x].allElements[1].text())) {
                     month = elements[x].allElements[1].text()
                 }
                 if (!months.contains(elements[x].allElements[1].text())) {
-                    val songkla: LocalRubber? = LocalRubber()
-                    songkla?.localPrice = elements[x].getElementsByClass("num2")[0].text().replace(",", "")
-                    songkla?.latexPrice = elements[x].getElementsByClass("num2")[2].text().replace(",", "")
+                    val songkla: Rubber? = Rubber()
+                    songkla?.price = elements[x].getElementsByClass("num2")[0].text().replace(",", "")
+                    songkla?.volume = elements[x].getElementsByClass("num2")[1].text().replace(",", "")
                     songkla?.date = String.format("%s.%02d.%02d", year.toString(), (months.indexOf(month) + 1), elements[x].allElements.select(".day").text().toInt())
-                    val surat: LocalRubber? = LocalRubber()
-                    surat?.localPrice = elements[x].getElementsByClass("num2")[3].text().replace(",", "")
-                    surat?.latexPrice = elements[x].getElementsByClass("num2")[4].text().replace(",", "")
+                    val surat: Rubber? = Rubber()
+                    surat?.price = elements[x].getElementsByClass("num2")[2].text().replace(",", "")
+                    surat?.volume = elements[x].getElementsByClass("num2")[3].text().replace(",", "")
                     surat?.date = String.format("%s.%02d.%02d", year.toString(), (months.indexOf(month) + 1), elements[x].allElements.select(".day").text().toInt())
-                    val nakorn: LocalRubber? = LocalRubber()
-                    nakorn?.localPrice = elements[x].getElementsByClass("num2")[5].text().replace(",", "")
-                    nakorn?.latexPrice = elements[x].getElementsByClass("num2")[6].text().replace(",", "")
+                    val nakorn: Rubber? = Rubber()
+                    nakorn?.price = elements[x].getElementsByClass("num2")[4].text().replace(",", "")
+                    nakorn?.volume = elements[x].getElementsByClass("num2")[5].text().replace(",", "")
                     nakorn?.date = String.format("%s.%02d.%02d", year.toString(), (months.indexOf(month) + 1), elements[x].allElements.select(".day").text().toInt())
 
-                    songkhlaList?.add(songkla as LocalRubber)
-                    suratList?.add(surat as LocalRubber)
-                    nakornList?.add(nakorn as LocalRubber)
+                    songkhlaList?.add(songkla as Rubber)
+                    suratList?.add(surat as Rubber)
+                    nakornList?.add(nakorn as Rubber)
                 }
             }
         }
@@ -66,10 +63,9 @@ object LocalPriceTask : TimerTask() {
         val mapper = ObjectMapper()
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
         val jsonInString = mapper.writeValueAsString(rubberModel)
-        File("local_price.json").writeText(jsonInString)
-        print("Local Price Service Successful\n")
+        File("rss_price.json").writeText(jsonInString)
+        print("RSS Price Service Successful\n")
     }
-
 
 }
 
