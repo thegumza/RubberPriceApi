@@ -11,26 +11,26 @@ import org.jsoup.select.Elements
 import java.io.File
 import java.util.*
 
-object RSSPriceTask : java.util.TimerTask() {
+object RSSPriceTask : TimerTask() {
     var months = arrayOf("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฏาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม")
     override fun run() {
-        val client = com.squareup.okhttp.OkHttpClient()
+        val client = OkHttpClient()
 
-        val request = com.squareup.okhttp.Request.Builder()
+        val request = Request.Builder()
                 .url("http://www.rubberthai.com/yang/HisRSS.php")
                 .get()
                 .addHeader("cache-control", "no-cache")
                 .build()
 
         val response = client.newCall(request).execute()
-        val doc: org.jsoup.nodes.Document? = org.jsoup.Jsoup.parse(response.body().string())
-        val elements: org.jsoup.select.Elements? = doc?.getElementsByTag("tbody")?.first()?.getElementsByTag("tr")
+        val doc: Document? = Jsoup.parse(response.body().string())
+        val elements: Elements? = doc?.getElementsByTag("tbody")?.first()?.getElementsByTag("tr")
         var month: String? = null
         val year = doc?.select(".year")?.text()?.toInt()?.minus(543)
-        val rubberModel: model.RubberModel? = model.RubberModel()
-        val songkhlaList: MutableList<model.Rubber>? = java.util.ArrayList()
-        val suratList: MutableList<model.Rubber>? = java.util.ArrayList()
-        val nakornList: MutableList<model.Rubber>? = java.util.ArrayList()
+        val rubberModel: RubberModel? = RubberModel()
+        val songkhlaList: MutableList<Rubber>? = ArrayList()
+        val suratList: MutableList<Rubber>? = ArrayList()
+        val nakornList: MutableList<Rubber>? = ArrayList()
         for (x in elements?.indices!!) {
             if (x > 4) {
                 if (months.contains(elements[x].allElements[1].text())) {
